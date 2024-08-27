@@ -1,0 +1,265 @@
+mysql> use company;
+Database changed
+
+mysql> desc employee;
++-----------+-------------+------+-----+---------+-------+
+| Field     | Type        | Null | Key | Default | Extra |
++-----------+-------------+------+-----+---------+-------+
+| ssn       | int         | NO   | PRI | NULL    |       |
+| sex       | varchar(1)  | YES  |     | NULL    |       |
+| salary    | int         | YES  |     | NULL    |       |
+| address   | varchar(20) | YES  |     | NULL    |       |
+| dob       | date        | YES  |     | NULL    |       |
+| dept_no   | int         | YES  | MUL | NULL    |       |
+| super_ssn | int         | YES  | MUL | NULL    |       |
+| emp_fname | varchar(30) | YES  |     | NULL    |       |
+| emp_lname | varchar(30) | YES  |     | NULL    |       |
++-----------+-------------+------+-----+---------+-------+
+9 rows in set (0.00 sec)
+
+mysql> desc department;
++-----------+-------------+------+-----+---------+-------+
+| Field     | Type        | Null | Key | Default | Extra |
++-----------+-------------+------+-----+---------+-------+
+| locations | varchar(30) | YES  |     | NULL    |       |
+| dept_name | varchar(20) | YES  |     | NULL    |       |
+| ssn       | int         | YES  | MUL | NULL    |       |
+| dept_no   | int         | NO   | PRI | NULL    |       |
++-----------+-------------+------+-----+---------+-------+
+4 rows in set (0.00 sec)
+
+mysql> insert into department (dept_name, dept_no) values ("Research", 5);
+Query OK, 1 row affected (0.03 sec)
+
+mysql> INSERT INTO employee (emp_fname, emp_lname, ssn, super_ssn, dob, dept_no, sex, salary, address) 
+    -> VALUES ('Ramesh', 'Narayan', 1, NULL, '1980-01-01', NULL, 'M', 50000, 'Ernakulam');
+Query OK, 1 row affected (0.02 sec)
+
+mysql> delete from department where dept_no=5;
+Query OK, 1 row affected (0.00 sec)
+
+mysql> INSERT INTO department (dept_name, dept_no, ssn)  VALUES ('Research', 5, 1);
+Query OK, 1 row affected (0.02 sec)
+
+mysql> INSERT INTO employee (emp_fname, emp_lname, ssn, super_ssn, dob, dept_no, sex, salary, address) 
+    -> VALUES ('Ramesh', 'Narayan', 666884444, 1, '1998-11-18', 5, 'M', 25000, 'Cochin');
+Query OK, 1 row affected (0.02 sec)
+
+mysql> delete from employee where emp_fname = "Ramesh";
+ERROR 1451 (23000): Cannot delete or update a parent row: a foreign key constraint fails (`company`.`department`, CONSTRAINT `department_ibfk_1` FOREIGN KEY (`ssn`) REFERENCES `employee` (`ssn`))
+mysql> delete from department where dept_no=5;
+ERROR 1451 (23000): Cannot delete or update a parent row: a foreign key constraint fails (`company`.`employee`, CONSTRAINT `employee_ibfk_1` FOREIGN KEY (`dept_no`) REFERENCES `department` (`dept_no`))
+mysql> delete from employee where ssn=1;
+ERROR 1451 (23000): Cannot delete or update a parent row: a foreign key constraint fails (`company`.`department`, CONSTRAINT `department_ibfk_1` FOREIGN KEY (`ssn`) REFERENCES `employee` (`ssn`))
+mysql> select * from employee;
++-----------+------+--------+-----------+------------+---------+-----------+-----------+-----------+
+| ssn       | sex  | salary | address   | dob        | dept_no | super_ssn | emp_fname | emp_lname |
++-----------+------+--------+-----------+------------+---------+-----------+-----------+-----------+
+|         1 | M    |  50000 | Ernakulam | 1980-01-01 |    NULL |      NULL | Ramesh    | Narayan   |
+| 666884444 | M    |  25000 | Cochin    | 1998-11-18 |       5 |         1 | Ramesh    | Narayan   |
++-----------+------+--------+-----------+------------+---------+-----------+-----------+-----------+
+2 rows in set (0.00 sec)
+
+mysql> 
+mysql> ALTER TABLE department DROP FOREIGN KEY department_ibfk_1;
+Query OK, 0 rows affected (0.03 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> ALTER TABLE employee DROP FOREIGN KEY employee_ibfk_1;
+Query OK, 0 rows affected (0.02 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> DELETE FROM employee WHERE ssn = 1;
+ERROR 1451 (23000): Cannot delete or update a parent row: a foreign key constraint fails (`company`.`employee`, CONSTRAINT `employee_ibfk_2` FOREIGN KEY (`super_ssn`) REFERENCES `employee` (`ssn`))
+mysql> delete from department where dept_no=5;
+Query OK, 1 row affected (0.01 sec)
+
+mysql> DELETE FROM employee WHERE ssn = 1;
+ERROR 1451 (23000): Cannot delete or update a parent row: a foreign key constraint fails (`company`.`employee`, CONSTRAINT `employee_ibfk_2` FOREIGN KEY (`super_ssn`) REFERENCES `employee` (`ssn`))
+mysql> alter table employee drop foreign key employee_ibfk_2
+    -> ;
+Query OK, 0 rows affected (0.02 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> DELETE FROM employee WHERE ssn = 1;
+Query OK, 1 row affected (0.01 sec)
+
+mysql> select * from employee;
++-----------+------+--------+---------+------------+---------+-----------+-----------+-----------+
+| ssn       | sex  | salary | address | dob        | dept_no | super_ssn | emp_fname | emp_lname |
++-----------+------+--------+---------+------------+---------+-----------+-----------+-----------+
+| 666884444 | M    |  25000 | Cochin  | 1998-11-18 |       5 |         1 | Ramesh    | Narayan   |
++-----------+------+--------+---------+------------+---------+-----------+-----------+-----------+
+1 row in set (0.00 sec)
+
+mysql> select * from department
+    -> ;
+Empty set (0.00 sec)
+
+mysql> insert into department (dept_no, dept_name, ssn) values (5, "Research", 666884444);
+Query OK, 1 row affected (0.02 sec)
+
+mysql> desc department;
++-----------+-------------+------+-----+---------+-------+
+| Field     | Type        | Null | Key | Default | Extra |
++-----------+-------------+------+-----+---------+-------+
+| locations | varchar(30) | YES  |     | NULL    |       |
+| dept_name | varchar(20) | YES  |     | NULL    |       |
+| ssn       | int         | YES  | MUL | NULL    |       |
+| dept_no   | int         | NO   | PRI | NULL    |       |
++-----------+-------------+------+-----+---------+-------+
+4 rows in set (0.00 sec)
+
+mysql> desc employee;
++-----------+-------------+------+-----+---------+-------+
+| Field     | Type        | Null | Key | Default | Extra |
++-----------+-------------+------+-----+---------+-------+
+| ssn       | int         | NO   | PRI | NULL    |       |
+| sex       | varchar(1)  | YES  |     | NULL    |       |
+| salary    | int         | YES  |     | NULL    |       |
+| address   | varchar(20) | YES  |     | NULL    |       |
+| dob       | date        | YES  |     | NULL    |       |
+| dept_no   | int         | YES  | MUL | NULL    |       |
+| super_ssn | int         | YES  | MUL | NULL    |       |
+| emp_fname | varchar(30) | YES  |     | NULL    |       |
+| emp_lname | varchar(30) | YES  |     | NULL    |       |
++-----------+-------------+------+-----+---------+-------+
+9 rows in set (0.00 sec)
+
+mysql> select * from employee;
++-----------+------+--------+---------+------------+---------+-----------+-----------+-----------+
+| ssn       | sex  | salary | address | dob        | dept_no | super_ssn | emp_fname | emp_lname |
++-----------+------+--------+---------+------------+---------+-----------+-----------+-----------+
+| 666884444 | M    |  25000 | Cochin  | 1998-11-18 |       5 |         1 | Ramesh    | Narayan   |
++-----------+------+--------+---------+------------+---------+-----------+-----------+-----------+
+1 row in set (0.00 sec)
+
+mysql> select * from department
+    -> ;
+Empty set (0.00 sec)
+
+mysql> insert into department (dept_no, dept_name, ssn) values (5, "Research", 666884444);
+Query OK, 1 row affected (0.02 sec)
+
+mysql> desc department;
++-----------+-------------+------+-----+---------+-------+
+| Field     | Type        | Null | Key | Default | Extra |
++-----------+-------------+------+-----+---------+-------+
+| locations | varchar(30) | YES  |     | NULL    |       |
+| dept_name | varchar(20) | YES  |     | NULL    |       |
+| ssn       | int         | YES  | MUL | NULL    |       |
+| dept_no   | int         | NO   | PRI | NULL    |       |
++-----------+-------------+------+-----+---------+-------+
+4 rows in set (0.00 sec)
+
+mysql> desc employee;
++-----------+-------------+------+-----+---------+-------+
+| Field     | Type        | Null | Key | Default | Extra |
++-----------+-------------+------+-----+---------+-------+
+| ssn       | int         | NO   | PRI | NULL    |       |
+| sex       | varchar(1)  | YES  |     | NULL    |       |
+| salary    | int         | YES  |     | NULL    |       |
+| address   | varchar(20) | YES  |     | NULL    |       |
+| dob       | date        | YES  |     | NULL    |       |
+| dept_no   | int         | YES  | MUL | NULL    |       |
+| super_ssn | int         | YES  | MUL | NULL    |       |
+| emp_fname | varchar(30) | YES  |     | NULL    |       |
+| emp_lname | varchar(30) | YES  |     | NULL    |       |
++-----------+-------------+------+-----+---------+-------+
+9 rows in set (0.00 sec)
+
+mysql> desc department;
++-----------+-------------+------+-----+---------+-------+
+| Field     | Type        | Null | Key | Default | Extra |
++-----------+-------------+------+-----+---------+-------+
+| locations | varchar(30) | YES  |     | NULL    |       |
+| dept_name | varchar(20) | YES  |     | NULL    |       |
+| ssn       | int         | YES  | MUL | NULL    |       |
+| dept_no   | int         | NO   | PRI | NULL    |       |
++-----------+-------------+------+-----+---------+-------+
+4 rows in set (0.00 sec)
+
+mysql> desc employee;
++-----------+-------------+------+-----+---------+-------+
+| Field     | Type        | Null | Key | Default | Extra |
++-----------+-------------+------+-----+---------+-------+
+| ssn       | int         | NO   | PRI | NULL    |       |
+| sex       | varchar(1)  | YES  |     | NULL    |       |
+| salary    | int         | YES  |     | NULL    |       |
+| address   | varchar(20) | YES  |     | NULL    |       |
+| dob       | date        | YES  |     | NULL    |       |
+| dept_no   | int         | YES  | MUL | NULL    |       |
+| super_ssn | int         | YES  | MUL | NULL    |       |
+| emp_fname | varchar(30) | YES  |     | NULL    |       |
+| emp_lname | varchar(30) | YES  |     | NULL    |       |
++-----------+-------------+------+-----+---------+-------+
+9 rows in set (0.00 sec)
+
+mysql> select * from employee;
++-----------+------+--------+---------+------------+---------+-----------+-----------+-----------+
+| ssn       | sex  | salary | address | dob        | dept_no | super_ssn | emp_fname | emp_lname |
++-----------+------+--------+---------+------------+---------+-----------+-----------+-----------+
+| 666884444 | M    |  25000 | Cochin  | 1998-11-18 |       5 |         1 | Ramesh    | Narayan   |
++-----------+------+--------+---------+------------+---------+-----------+-----------+-----------+
+1 row in set (0.00 sec)
+
+mysql> select * from department;
++-----------+-----------+-----------+---------+
+| locations | dept_name | ssn       | dept_no |
++-----------+-----------+-----------+---------+
+| NULL      | Research  | 666884444 |       5 |
++-----------+-----------+-----------+---------+
+1 row in set (0.00 sec)
+
+mysql> select address from employee where emp_fname = "Ramesh" and emp_lname="Narayan";
++---------+
+| address |
++---------+
+| Cochin  |
++---------+
+1 row in set (0.00 sec)
+
+mysql> select * from employee where dept_no=5;
++-----------+------+--------+---------+------------+---------+-----------+-----------+-----------+
+| ssn       | sex  | salary | address | dob        | dept_no | super_ssn | emp_fname | emp_lname |
++-----------+------+--------+---------+------------+---------+-----------+-----------+-----------+
+| 666884444 | M    |  25000 | Cochin  | 1998-11-18 |       5 |         1 | Ramesh    | Narayan   |
++-----------+------+--------+---------+------------+---------+-----------+-----------+-----------+
+1 row in set (0.00 sec)
+
+mysql> select * from employee join department on employee.dept_no=department.dept_no where department.dept_name="Research";
++-----------+------+--------+---------+------------+---------+-----------+-----------+-----------+-----------+-----------+-----------+---------+
+| ssn       | sex  | salary | address | dob        | dept_no | super_ssn | emp_fname | emp_lname | locations | dept_name | ssn       | dept_no |
++-----------+------+--------+---------+------------+---------+-----------+-----------+-----------+-----------+-----------+-----------+---------+
+| 666884444 | M    |  25000 | Cochin  | 1998-11-18 |       5 |         1 | Ramesh    | Narayan   | NULL      | Research  | 666884444 |       5 |
++-----------+------+--------+---------+------------+---------+-----------+-----------+-----------+-----------+-----------+-----------+---------+
+1 row in set (0.00 sec)
+
+mysql> select ssn from department where dept_name = "Research";
++-----------+
+| ssn       |
++-----------+
+| 666884444 |
++-----------+
+1 row in set (0.00 sec)
+
+mysql> select employee.emp_fname, employee.emp_lname from employee join department on employee.ssn = department.ssn;
++-----------+-----------+
+| emp_fname | emp_lname |
++-----------+-----------+
+| Ramesh    | Narayan   |
++-----------+-----------+
+1 row in set (0.00 sec)
+
+mysql> update employee set salary = salary + 1000 where ssn = 666884444;
+Query OK, 1 row affected (0.02 sec)
+Rows matched: 1  Changed: 1  Warnings: 0
+
+mysql> update employee set address = "100 center stafford 7X74777" where ssn=666884444;
+ERROR 1406 (22001): Data too long for column 'address' at row 1
+mysql> update employee set address = "100 center stafford" where ssn=666884444;
+Query OK, 1 row affected (0.02 sec)
+Rows matched: 1  Changed: 1  Warnings: 0
+
+mysql> 
+
